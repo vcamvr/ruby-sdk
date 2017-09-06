@@ -103,7 +103,7 @@ module Qiniu
               }
           }
           if !content_type.nil? && !content_type.empty? then
-              options[:headers][:content_type] = content_type 
+              options[:headers][:content_type] = content_type
           end
 
           code, data, raw_headers = HTTP.api_post(url, data, options)
@@ -254,7 +254,7 @@ module Qiniu
 
         def _mkfile(uphost,
                     uptoken,
-                    entry_uri,
+                    key,
                     fsize,
                     checksums,
                     mime_type = nil,
@@ -262,7 +262,8 @@ module Qiniu
                     customer = nil,
                     callback_params = nil,
                     rotate = nil)
-          path = '/rs-mkfile/' + Utils.urlsafe_base64_encode(entry_uri) + "/fsize/#{fsize}"
+          path = "/mkfile/#{fsize}"
+          path += "/key/#{Utils.urlsafe_base64_encode(key)}"
           path += '/mimeType/' + Utils.urlsafe_base64_encode(mime_type) if !mime_type.nil? && !mime_type.empty?
           path += '/meta/' + Utils.urlsafe_base64_encode(custom_meta) if !custom_meta.nil? && !custom_meta.empty?
           path += '/customer/' + customer if !customer.nil? && !customer.empty?
@@ -304,7 +305,7 @@ module Qiniu
           if HTTP.is_response_ok?(code)
             uphost = data["host"]
             entry_uri = bucket + ':' + key
-            code, data, raw_headers = _mkfile(uphost, uptoken, entry_uri, fsize, checksums, mime_type, custom_meta, customer, callback_params, rotate)
+            code, data, raw_headers = _mkfile(uphost, uptoken, key, fsize, checksums, mime_type, custom_meta, customer, callback_params, rotate)
             Utils.debug "Mkfile : #{code.inspect} #{data.inspect} #{raw_headers.inspect}"
           end
 
